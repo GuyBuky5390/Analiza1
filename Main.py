@@ -138,7 +138,11 @@ def main():
     else:
         X = LUMethod(A, B)
 
-    print("The result of Ax=b is:")
+    print("A: ")
+    printMatrix(A)
+    print("B: ")
+    printMatrix(B)
+    print("The result of Ax=B is:")
     printMatrix(X)
     print(f"Solved using the {getMethod(A)}")
 
