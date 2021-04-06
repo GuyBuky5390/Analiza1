@@ -1,5 +1,6 @@
 from copy import deepcopy
 from random import randint
+
 MIN_VALUE = 1
 MAX_VALUE = 10
 
@@ -62,12 +63,14 @@ def invertMatrix(A):
                 I_COPY[i][j] = I_COPY[i][j] - crScaler * I_COPY[fd][j]
     return I_COPY
 
+
 def getL(matrix):
     raise NotImplementedError
 
 
 def getU(matrix):
     raise NotImplementedError
+
 
 # returns the solution of Ax=B using the invert method
 def invertMethod(A, B):
@@ -86,6 +89,7 @@ def LUMethod(A, B):
 
 def getMethod(A):
     return "Invert method" if isInvertible(A) else "LU method"
+
 
 # prints matrix
 def printMatrix(m):
@@ -114,8 +118,8 @@ def isSquareMatrix(m):
             return False
     return True
 
-def main():
 
+def main():
     # first, we create matrices A and B
     A = createMatrix(3)  # 3x3
     B = createMatrix(3)  # 3x3
