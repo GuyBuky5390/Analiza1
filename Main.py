@@ -4,13 +4,15 @@ from random import randint
 MIN_VALUE = 1
 MAX_VALUE = 10
 
-
+# calculates the determinant of a matrix
 def determinant(matrix: list):
     d = 0
-    if len(matrix) == 2:
+    if len(matrix) == 2: # base case
         return (matrix[0][0] * matrix[1][1]) - \
                (matrix[1][0] * matrix[0][1])
 
+    # we change the sign of each element(negative or positive)
+    # and multiply it recursively with the smaller determinant with the new matrix
     for i in range(len(matrix)):
         curr_item = ((-1) ** i) * matrix[0][i] * \
                     determinant(new_matrix(matrix, 0, i))
@@ -18,6 +20,7 @@ def determinant(matrix: list):
     return d
 
 
+# returns a new matrix minus the row and column given
 def new_matrix(m: list, row, column):
     new = deepcopy(m)
     new.pop(row)
@@ -26,75 +29,86 @@ def new_matrix(m: list, row, column):
     return new
 
 
+# returns an identity matrix based on n size
 def identityMatrix(n):
     matrix = [[0 for _ in range(n)] for _ in range(n)]
-    j = 0
-    for i in range(n):
-        matrix[i][j] = 1
-        j += 1
+    for i in range(n):  # assign 1 in the diagonal
+        matrix[i][i] = 1
     return matrix
 
-
-def isInvertible(matrix):
+# returns true if a matrix is invertible (det != 0) else false
+def isInvertible(matrix: list):
     return determinant(matrix) != 0
 
 
-def multiplyMatrices(m1, m2):
+# returns the value of two multiply matrices accordingly (m1 * m2)
+def multiplyMatrices(m1: list, m2: list):
     return [[sum(a * b for a, b in zip(m1_row, m2_col)) for m2_col in zip(*m2)]
             for m1_row in m1]
 
 
+# returns the inverted A matrix
 def invertMatrix(A):
-    A_COPY = deepcopy(A)
+    A_COPY = deepcopy(A)  # dont want to change the original A
     I = identityMatrix(len(A))
-    I_COPY = deepcopy(I)
     indices = list(range(len(A)))
 
     for fd in range(len(A)):
-        fdScaler = 1 / A_COPY[fd][fd]
+        pivot = 1 / A_COPY[fd][fd]
         for j in range(len(A)):
-            A_COPY[fd][j] *= fdScaler
-            I_COPY[fd][j] *= fdScaler
+            A_COPY[fd][j] *= pivot
+            I[fd][j] *= pivot
 
         for i in indices[0:fd] + indices[fd + 1:]:
             crScaler = A_COPY[i][fd]
             for j in range(len(A)):
                 A_COPY[i][j] = A_COPY[i][j] - crScaler * A_COPY[fd][j]
-                I_COPY[i][j] = I_COPY[i][j] - crScaler * I_COPY[fd][j]
-    return I_COPY
-
-
-def getL(matrix):
-    raise NotImplementedError
-
-
-def getU(matrix):
-    raise NotImplementedError
+                I[i][j] = I[i][j] - crScaler * I[fd][j]
+    return I
 
 
 # returns the solution of Ax=B using the invert method
 def invertMethod(A, B):
     A_INVERT = invertMatrix(A)
-    return multiplyMatrices(A_INVERT, B)
+    X = multiplyMatrices(A_INVERT, B)
+    print("The result is: ")
+    printMatrix(X)
 
 
 # returns the solution of Ax=B using the LU method
-def LUMethod(A, B):
-    L = getL(A)
-    U = getU(L)
-    L_INVERT = invertMatrix(L)
-    U_INVERT = invertMatrix(U)
-    return multiplyMatrices(multiplyMatrices(L_INVERT, U_INVERT), B)
+def LUMethod(A):
+    # we create the first L matrix so we can continue to the next iterations
+    matrix = deepcopy(A)
+    elementary = identityMatrix(len(matrix))
+    elementary[0][1] = (-1) * (matrix[0][1] / matrix[0][0])
+    matrix = multiplyMatrices(elementary, matrix)
+    L_MATRIX = invertMatrix(elementary)
 
+    # we first check if the matrix is 2x2. if true, the L and U matrices already been found
+    # otherwise, we proceed,
+    if len(matrix) > 2:
+        for i in range(len(matrix)):
+            # we iterate over each pivot and over each item below the pivot in the column
+            # for each item we create an elementary matrix and multiply the inverted elementary matrix with L
+            pivot = matrix[i][i]
 
-def getMethod(A):
-    return "Invert method" if isInvertible(A) else "LU method"
+            for j in range(i + 1, len(matrix)):
+                elementary = identityMatrix(len(matrix))
+                elementary[i][j] = (-1) * (matrix[i][j] / pivot)
+                matrix = multiplyMatrices(elementary, matrix)
+                elementary_inverted = invertMatrix(elementary)
+                L_MATRIX = multiplyMatrices(L_MATRIX, elementary_inverted)
+
+    print("the L matrix: ")
+    printMatrix(L_MATRIX)
+    print("the U matrix: ")
+    printMatrix(matrix)
 
 
 # prints matrix
 def printMatrix(m):
     for row in m:
-        print(row)
+        print([float("{:.2f}".format(item)) for item in row])
 
 
 # creates a new matrix
@@ -134,17 +148,11 @@ def main():
     # if invertible, we use the standard Invert method
     # if A is not invertible, we use the LU decomposition method
     if isInvertible(A):
-        X = invertMethod(A, B)
+        print("USING THE INVERT METHOD\n")
+        invertMethod(A, B)
     else:
-        X = LUMethod(A, B)
-
-    print("A: ")
-    printMatrix(A)
-    print("B: ")
-    printMatrix(B)
-    print("The result of Ax=B is:")
-    printMatrix(X)
-    print(f"Solved using the {getMethod(A)}")
+        print("USING THE LU METHOD\n")
+        LUMethod(A)
 
 
 if __name__ == '__main__':
