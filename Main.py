@@ -4,10 +4,11 @@ from random import randint
 MIN_VALUE = 1
 MAX_VALUE = 10
 
+
 # calculates the determinant of a matrix
 def determinant(matrix: list):
     d = 0
-    if len(matrix) == 2: # base case
+    if len(matrix) == 2:  # base case
         return (matrix[0][0] * matrix[1][1]) - \
                (matrix[1][0] * matrix[0][1])
 
@@ -31,10 +32,13 @@ def new_matrix(m: list, row, column):
 
 # returns an identity matrix based on n size
 def identityMatrix(n):
-    matrix = [[0 for _ in range(n)] for _ in range(n)]
-    for i in range(n):  # assign 1 in the diagonal
-        matrix[i][i] = 1
+    matrix = []
+    for i in range(n):
+        matrix.append([0 for _ in range(n)])
+    for j in range(n):
+        matrix[j][j] = 1
     return matrix
+
 
 # returns true if a matrix is invertible (det != 0) else false
 def isInvertible(matrix: list):
@@ -71,7 +75,7 @@ def invertMatrix(A):
 def invertMethod(A, B):
     A_INVERT = invertMatrix(A)
     X = multiplyMatrices(A_INVERT, B)
-    print("The result is: ")
+    print("The result of x is: ")
     printMatrix(X)
 
 
@@ -101,7 +105,7 @@ def LUMethod(A):
 
     print("the L matrix: ")
     printMatrix(L_MATRIX)
-    print("the U matrix: ")
+    print("\nthe U matrix: ")
     printMatrix(matrix)
 
 
@@ -137,6 +141,10 @@ def main():
     # first, we create matrices A and B
     A = createMatrix(3)  # 3x3
     B = createMatrix(3)  # 3x3
+    print("A: ")
+    printMatrix(A)
+    print("B: ")
+    printMatrix(B)
 
     # second, we check if A is a squared matrix
     # otherwise, we have no point of proceeding..
@@ -148,10 +156,10 @@ def main():
     # if invertible, we use the standard Invert method
     # if A is not invertible, we use the LU decomposition method
     if isInvertible(A):
-        print("USING THE INVERT METHOD\n")
+        print("\nUsing the Invert method,")
         invertMethod(A, B)
     else:
-        print("USING THE LU METHOD\n")
+        print("\nUsing the LU method,")
         LUMethod(A)
 
 
